@@ -3,7 +3,7 @@
 本指南用于验证系统各项工业 ERP 联动逻辑的正确性与稳定性。无需后端依赖，所有交互在浏览器即可运行。
 
 ## 测试准备
-1. 打开浏览器，运行 `/Volumes/D/项目/google/project_004_industrial_erp/src/index.html`。
+1. 打开浏览器，运行 `/Volumes/D/项目/google/project_004_industrial_erp/index.html`。
 2. 如果页面有旧的实验数据干扰，点击左侧菜单底部的 **“重置演示数据”**，使系统回到干净的预设演示状态。
 
 ---

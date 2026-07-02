@@ -17,18 +17,18 @@
 project_004_industrial_erp/
 ├── docs/
 │   └── design.md           # 详细业务逻辑与数据模型设计
-├── src/
-│   ├── index.html          # 系统主入口 (HTML + Tailwind CDN)
-│   ├── app.js              # 核心业务逻辑与数据驱动逻辑 (Vanilla JS)
-│   └── style.css           # 自定义局部微调样式
 ├── tests/
 │   └── manual_test.md      # 手动验证方案与测试步骤
+├── index.html              # 系统主入口 (HTML + Tailwind CDN)
+├── app.js                  # 核心业务逻辑与数据驱动逻辑 (Vanilla JS)
+├── style.css               # 自定义样式微调
+├── tailwind.js             # 本地化缓存的 Tailwind 编译器 (避免 CORS)
 └── README.md               # 本说明文档
 ```
 
 ## 运行方式
 
-无需任何后端依赖，双击或通过本地 Web 服务器（如 Live Server）打开 `src/index.html` 即可。
+无需任何后端依赖，双击或通过本地 Web 服务器（如 Live Server）打开 `index.html` 即可。
 
 ## 数据重置
 
