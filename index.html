@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="h-full bg-slate-50">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>工业生产与销售 ERP 管理系统</title>
+  <!-- Tailwind CSS (Local fallback to bypass CORS under file:// protocol) -->
+  <script src="tailwind.js"></script>
+  <!-- Google Fonts Outfit & Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <!-- Custom tailwind configuration -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            primary: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              200: '#bae2fd',
+              300: '#7cc8fb',
+              400: '#38a9f8',
+              500: '#0e8ce4',
+              600: '#026fc5',
+              700: '#03589f',
+              800: '#074b83',
+              900: '#0c406e',
+              950: '#08294a',
+            },
+            industrial: {
+              50: '#f6f8fa',
+              100: '#eaeef2',
+              200: '#d5dee6',
+              300: '#b2c3d1',
+              400: '#87a1b7',
+              500: '#65829d',
+              600: '#506a83',
+              700: '#41556b',
+              800: '#384758',
+              900: '#313d4b',
+              950: '#1d242e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="h-full font-sans text-slate-800 flex overflow-hidden">
+
+  <!-- Left Sidebar Navigation -->
+  <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col flex-shrink-0 z-20">
+    <!-- Brand / Title -->
+    <div class="h-16 flex items-center px-6 bg-slate-950 border-b border-slate-800">
+      <i class="fa-solid fa-industry text-primary-500 text-2xl mr-3"></i>
+      <span class="font-display font-bold text-lg tracking-wider text-white">工业 ERP 管理系统</span>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+      <a href="#" data-view="dashboard" class="nav-item flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 group active-nav text-white bg-slate-800">
+        <i class="fa-solid fa-chart-line text-lg mr-3 text-primary-400 group-hover:text-primary-300"></i>
+        数据工作台
+      </a>
+      <a href="#" data-view="procurement" class="nav-item flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 group text-slate-400 hover:text-white hover:bg-slate-800/50">
+        <i class="fa-solid fa-truck-ramp-box text-lg mr-3 text-slate-500 group-hover:text-slate-300"></i>
+        原料采购
+      </a>
+      <a href="#" data-view="inventory" class="nav-item flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 group text-slate-400 hover:text-white hover:bg-slate-800/50">
+        <i class="fa-solid fa-warehouse text-lg mr-3 text-slate-500 group-hover:text-slate-300"></i>
+        库存看板
+      </a>
+      <a href="#" data-view="manufacturing" class="nav-item flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 group text-slate-400 hover:text-white hover:bg-slate-800/50">
+        <i class="fa-solid fa-gears text-lg mr-3 text-slate-500 group-hover:text-slate-300"></i>
+        生产加工
+      </a>
+      <a href="#" data-view="sales" class="nav-item flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 group text-slate-400 hover:text-white hover:bg-slate-800/50">
+        <i class="fa-solid fa-file-invoice-dollar text-lg mr-3 text-slate-500 group-hover:text-slate-300"></i>
+        销售订单
+      </a>
+    </nav>
+
+    <!-- Bottom Profile & Operations -->
+    <div class="p-4 border-t border-slate-800 bg-slate-950">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white font-bold text-sm">
+            管
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-white">管理员</p>
+            <p class="text-xs text-slate-500">System Admin</p>
+          </div>
+        </div>
+      </div>
+      <button id="btn-reset-db" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 px-3 rounded-md text-xs font-medium flex items-center justify-center transition duration-150">
+        <i class="fa-solid fa-rotate-left mr-2"></i>
+        重置演示数据
+      </button>
+    </div>
+  </aside>
+
+  <!-- Right Main App Area -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <!-- Top Status Bar -->
+    <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 flex-shrink-0">
+      <div class="flex items-center space-x-3">
+        <h2 id="header-view-title" class="font-display font-semibold text-xl text-slate-900">数据工作台</h2>
+        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 flex items-center">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
+          系统运行中
+        </span>
+      </div>
+
+      <div class="flex items-center space-x-6 text-sm text-slate-500">
+        <div class="flex items-center space-x-2">
+          <i class="fa-regular fa-clock text-slate-400"></i>
+          <span>系统时间: <strong id="system-time" class="text-slate-800 font-mono">2026-07-02 14:09:24</strong></span>
+        </div>
+        <div class="w-px h-4 bg-slate-200"></div>
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-database text-slate-400"></i>
+          <span>存储: <strong id="storage-indicator" class="text-slate-800">LocalStorage</strong></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content Panel -->
+    <main class="flex-1 overflow-y-auto bg-slate-50 p-8">
+      
+      <!-- ==================== VIEW: DASHBOARD ==================== -->
+      <div id="view-dashboard" class="view-panel space-y-6">
+        <!-- Top Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between hover:shadow-md transition duration-200">
+            <div>
+              <p class="text-sm font-medium text-slate-500 mb-1">原料类目数</p>
+              <h3 id="stat-raw-materials-count" class="text-3xl font-display font-bold text-slate-900">0</h3>
+              <p class="text-xs text-slate-400 mt-2">系统登记的基础原料种类</p>
+            </div>
+            <div class="p-4 bg-blue-50 rounded-lg text-primary-600">
+              <i class="fa-solid fa-boxes-stacked text-2xl"></i>
+            </div>
+          </div>
+          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between hover:shadow-md transition duration-200">
+            <div>
+              <p class="text-sm font-medium text-slate-500 mb-1">待加工工单</p>
+              <h3 id="stat-pending-orders-count" class="text-3xl font-display font-bold text-amber-600">0</h3>
+              <p class="text-xs text-slate-400 mt-2">当前处于“待加工”的任务量</p>
+            </div>
+            <div class="p-4 bg-amber-50 rounded-lg text-amber-600">
+              <i class="fa-solid fa-screwdriver-wrench text-2xl"></i>
+            </div>
+          </div>
+          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between hover:shadow-md transition duration-200">
+            <div>
+              <p class="text-sm font-medium text-slate-500 mb-1">今日累计销售额</p>
+              <h3 id="stat-today-sales" class="text-3xl font-display font-bold text-emerald-600">￥0.00</h3>
+              <div class="text-xs text-slate-400 mt-2 flex items-center space-x-2">
+                <span>净利润:</span>
+                <span id="stat-today-profit" class="font-semibold text-emerald-600">￥0.00</span>
+              </div>
+            </div>
+            <div class="p-4 bg-emerald-50 rounded-lg text-emerald-600">
+              <i class="fa-solid fa-circle-dollar-to-slot text-2xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Left: Stock Warnings -->
+          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm lg:col-span-2 flex flex-col">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="font-display font-semibold text-base text-slate-900 flex items-center">
+                <i class="fa-solid fa-triangle-exclamation text-amber-500 mr-2"></i>
+                库存缺口 & 预警看板
+              </h4>
+              <span id="dashboard-warning-count" class="px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+                0 项预警
+              </span>
+            </div>
+            <div class="flex-1 overflow-x-auto">
+              <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr class="border-b border-slate-100 text-slate-400 font-medium bg-slate-50/50">
+                    <th class="py-2.5 px-4">物料类型</th>
+                    <th class="py-2.5 px-4">编码</th>
+                    <th class="py-2.5 px-4">名称</th>
+                    <th class="py-2.5 px-4">规格</th>
+                    <th class="py-2.5 px-4 text-right">当前库存</th>
+                    <th class="py-2.5 px-4 text-right">安全库存</th>
+                    <th class="py-2.5 px-4 text-center">状态</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboard-warnings-tbody" class="divide-y divide-slate-100">
+                  <!-- Warning rows go here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Right: Recent Activities -->
+          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col">
+            <h4 class="font-display font-semibold text-base text-slate-900 mb-4 flex items-center">
+              <i class="fa-solid fa-clock-rotate-left text-slate-500 mr-2"></i>
+              系统实时日志
+            </h4>
+            <div class="flex-1 overflow-y-auto max-h-[300px] space-y-4 pr-1" id="dashboard-activity-log">
+              <!-- Logs dynamic -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== VIEW: PROCUREMENT ==================== -->
+      <div id="view-procurement" class="view-panel space-y-6 hidden">
+        <!-- Add Procurement Form -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+          <h3 class="font-display font-semibold text-lg text-slate-900 mb-4 flex items-center">
+            <i class="fa-solid fa-plus-circle text-primary-500 mr-2"></i>
+            录入采购入库单
+          </h3>
+          <form id="form-procurement" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">供应商 <span class="text-red-500">*</span></label>
+                <div class="flex space-x-2">
+                  <select id="procure-supplier" class="flex-1 rounded-lg border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 border" required>
+                    <option value="">-- 请选择供应商 --</option>
+                  </select>
+                  <button type="button" onclick="showModal('modal-add-supplier')" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 rounded-lg border border-slate-200" title="新增供应商">
+                    <i class="fa-solid fa-plus"></i>
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">入库日期 <span class="text-red-500">*</span></label>
+                <input type="date" id="procure-date" class="w-full rounded-lg border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 border" required>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">操作员</label>
+                <input type="text" class="w-full rounded-lg border-slate-200 bg-slate-100 px-3 py-2 text-sm border text-slate-500" value="管理员" readonly>
+              </div>
+            </div>
+
+            <!-- Materials Multi-row Entry -->
+            <div class="border-t border-slate-100 pt-6">
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-sm font-semibold text-slate-900">入库原料明细</span>
+                <button type="button" id="btn-procure-add-row" class="text-xs font-semibold text-primary-600 hover:text-primary-700 flex items-center">
+                  <i class="fa-solid fa-plus mr-1"></i> 添加原料行
+                </button>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                  <thead>
+                    <tr class="border-b border-slate-200 text-slate-500 bg-slate-50 font-medium">
+                      <th class="py-2.5 px-4 w-1/3">原料名称 <span class="text-red-500">*</span></th>
+                      <th class="py-2.5 px-4">采购单价 (元) <span class="text-red-500">*</span></th>
+                      <th class="py-2.5 px-4">采购数量 <span class="text-red-500">*</span></th>
+                      <th class="py-2.5 px-4 text-right">金额小计 (元)</th>
+                      <th class="py-2.5 px-4 w-16 text-center">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="procure-items-tbody" class="divide-y divide-slate-100">
+                    <!-- Row templates will be added here -->
+                  </tbody>
+                  <tfoot>
+                    <tr class="bg-slate-50/50 font-bold border-t border-slate-200">
+                      <td colspan="3" class="py-3 px-4 text-right text-slate-600">总计金额:</td>
+                      <td id="procure-total-amount" class="py-3 px-4 text-right text-primary-700">￥0.00</td>
+                      <td></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 border-t border-slate-100 pt-4">
+              <button type="reset" class="px-5 py-2 border border-slate-200 rounded-lg text-sm text-slate-500 hover:bg-slate-50">清空表单</button>
+              <button type="submit" class="px-5 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-semibold shadow-sm transition duration-150">确认采购入库</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Procurement History -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 space-y-3 md:space-y-0">
+            <h3 class="font-display font-semibold text-lg text-slate-900">采购历史明细表</h3>
+            <div class="flex items-center space-x-3">
+              <select id="filter-procure-supplier" class="rounded-lg border-slate-200 bg-slate-50 px-3 py-1.5 text-xs border focus:outline-none focus:ring-1 focus:ring-primary-500">
+                <option value="">-- 所有供应商 --</option>
+              </select>
+              <input type="text" id="filter-procure-search" placeholder="搜索批次/原料名称" class="rounded-lg border-slate-200 bg-slate-50 px-3 py-1.5 text-xs border focus:outline-none focus:ring-1 focus:ring-primary-500 w-48">
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 bg-slate-50 text-slate-500 font-medium">
+                  <th class="py-3 px-4">入库时间</th>
+                  <th class="py-3 px-4">入库批次号</th>
+                  <th class="py-3 px-4">供应商</th>
+                  <th class="py-3 px-4">原料名称</th>
+                  <th class="py-3 px-4">规格</th>
+                  <th class="py-3 px-4 text-right">单价 (元)</th>
+                  <th class="py-3 px-4 text-right">采购数</th>
+                  <th class="py-3 px-4 text-right">合计金额</th>
+                </tr>
+              </thead>
+              <tbody id="procure-history-tbody" class="divide-y divide-slate-100">
+                <!-- Data injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== VIEW: INVENTORY ==================== -->
+      <div id="view-inventory" class="view-panel space-y-6 hidden">
+        <!-- Tabs & Summary -->
+        <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+          <div class="flex space-x-2">
+            <button id="tab-inv-raw" class="px-5 py-2 bg-primary-600 text-white text-sm font-semibold rounded-lg shadow-sm">
+              原料仓储看板
+            </button>
+            <button id="tab-inv-finished" class="px-5 py-2 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-semibold rounded-lg">
+              成品仓储看板
+            </button>
+          </div>
+          <div class="text-xs text-slate-500 bg-amber-50 border border-amber-200 p-2 rounded-lg flex items-center">
+            <i class="fa-solid fa-circle-info text-amber-600 mr-2"></i>
+            物料库存低于安全存量时，对应数据行自动触发红色预警底色。
+          </div>
+        </div>
+
+        <!-- Raw Materials Inventory Dashboard -->
+        <div id="panel-inv-raw" class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+          <h3 class="font-display font-semibold text-lg text-slate-900 mb-4 flex items-center">
+            <i class="fa-solid fa-boxes-stacked text-primary-500 mr-2"></i>
+            原料实时库存列表
+          </h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 bg-slate-50 text-slate-500 font-medium">
+                  <th class="py-3 px-4">原料编码</th>
+                  <th class="py-3 px-4">原料名称</th>
+                  <th class="py-3 px-4">规格</th>
+                  <th class="py-3 px-4">单位</th>
+                  <th class="py-3 px-4 text-right">当前库存量</th>
+                  <th class="py-3 px-4 text-right">安全库存线</th>
+                  <th class="py-3 px-4 text-center">预警状态</th>
+                  <th class="py-3 px-4">货位</th>
+                  <th class="py-3 px-4 text-center">批次明细</th>
+                </tr>
+              </thead>
+              <tbody id="inventory-raw-tbody" class="divide-y divide-slate-100">
+                <!-- Dynamic raw inventory -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Raw batches sub-table -->
+          <div id="raw-batches-subpanel" class="mt-8 border-t border-slate-200 pt-6 hidden">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="font-display font-semibold text-base text-slate-800">
+                原料批次跟踪: <span id="trace-raw-material-name" class="text-primary-600">钢材</span>
+              </h4>
+              <button onclick="hideElement('raw-batches-subpanel')" class="text-xs text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-times mr-1"></i> 收起
+              </button>
+            </div>
+            <table class="w-full text-left border-collapse text-sm bg-slate-50 rounded-lg">
+              <thead>
+                <tr class="border-b border-slate-100 text-slate-500 font-medium">
+                  <th class="py-2.5 px-4">采购批次号</th>
+                  <th class="py-2.5 px-4">入库日期</th>
+                  <th class="py-2.5 px-4 text-right">入库数量</th>
+                  <th class="py-2.5 px-4 text-right">当前剩余数量</th>
+                  <th class="py-2.5 px-4 text-right">采购单价</th>
+                  <th class="py-2.5 px-4">供应商</th>
+                </tr>
+              </thead>
+              <tbody id="raw-batches-tbody" class="divide-y divide-slate-100 text-slate-600">
+                <!-- Batch items -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Finished Goods Inventory Dashboard -->
+        <div id="panel-inv-finished" class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hidden">
+          <h3 class="font-display font-semibold text-lg text-slate-900 mb-4 flex items-center">
+            <i class="fa-solid fa-cube text-primary-500 mr-2"></i>
+            成品真实库存列表
+          </h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 bg-slate-50 text-slate-500 font-medium">
+                  <th class="py-3 px-4">成品编码</th>
+                  <th class="py-3 px-4">成品名称</th>
+                  <th class="py-3 px-4">规格</th>
+                  <th class="py-3 px-4">单位</th>
+                  <th class="py-3 px-4 text-right">当前总库存</th>
+                  <th class="py-3 px-4 text-right">安全库存线</th>
+                  <th class="py-3 px-4 text-center">预警状态</th>
+                  <th class="py-3 px-4">货位</th>
+                  <th class="py-3 px-4 text-center">批次追溯</th>
+                </tr>
+              </thead>
+              <tbody id="inventory-finished-tbody" class="divide-y divide-slate-100">
+                <!-- Dynamic finished goods inventory -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Finished batches sub-table -->
+          <div id="finished-batches-subpanel" class="mt-8 border-t border-slate-200 pt-6 hidden">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="font-display font-semibold text-base text-slate-800">
+                成品库存批次明细: <span id="trace-finished-product-name" class="text-primary-600">成品A</span>
+              </h4>
+              <button onclick="hideElement('finished-batches-subpanel')" class="text-xs text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-times mr-1"></i> 收起
+              </button>
+            </div>
+            <table class="w-full text-left border-collapse text-sm bg-slate-50 rounded-lg">
+              <thead>
+                <tr class="border-b border-slate-100 text-slate-500 font-medium">
+                  <th class="py-2.5 px-4">生产加工批次号</th>
+                  <th class="py-2.5 px-4">完工日期</th>
+                  <th class="py-2.5 px-4 text-right">完工数量</th>
+                  <th class="py-2.5 px-4 text-right">当前剩余数量</th>
+                  <th class="py-2.5 px-4 text-right">单位加工成本</th>
+                  <th class="py-2.5 px-4 text-center">操作</th>
+                </tr>
+              </thead>
+              <tbody id="finished-batches-tbody" class="divide-y divide-slate-100 text-slate-600">
+                <!-- Batch items -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== VIEW: MANUFACTURING ==================== -->
+      <div id="view-manufacturing" class="view-panel space-y-6 hidden">
+        <!-- BOM Specifications -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-display font-semibold text-lg text-slate-900 flex items-center">
+              <i class="fa-solid fa-list-check text-primary-500 mr-2"></i>
+              BOM（物料清单）配比设定
+            </h3>
+            <button onclick="showModal('modal-edit-bom')" class="bg-primary-600 hover:bg-primary-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-sm transition">
+              <i class="fa-solid fa-gear mr-1"></i> 配置 BOM 配比
+            </button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="bom-list-container">
+            <!-- Dynamic BOM display cards -->
+          </div>
+        </div>
+
+        <!-- Issue Production Order -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+          <h3 class="font-display font-semibold text-lg text-slate-900 mb-4 flex items-center">
+            <i class="fa-solid fa-plus-circle text-primary-500 mr-2"></i>
+            创建加工工单
+          </h3>
+          <form id="form-production" class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">待生产成品 <span class="text-red-500">*</span></label>
+              <select id="prod-finished-good" class="w-full rounded-lg border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 border" required>
+                <option value="">-- 请选择产出成品 --</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">加工数量 <span class="text-red-500">*</span></label>
+              <input type="number" min="1" step="1" id="prod-qty" placeholder="输入计划生产数" class="w-full rounded-lg border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 border" required>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">加工车间</label>
+              <input type="text" class="w-full rounded-lg border-slate-200 bg-slate-100 px-3 py-2 text-sm border text-slate-500" value="第一装配车间" readonly>
+            </div>
+            <div>
+              <button type="submit" class="w-full px-5 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-semibold shadow-sm transition duration-150 h-10 flex items-center justify-center">
+                <i class="fa-solid fa-file-invoice mr-2"></i> 创建工单
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Production Work Orders Table -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+          <h3 class="font-display font-semibold text-lg text-slate-900 mb-4">生产工单加工日志</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 bg-slate-50 text-slate-500 font-medium">
+                  <th class="py-3 px-4">工单号</th>
+                  <th class="py-3 px-4">产出成品</th>
+                  <th class="py-3 px-4">规格</th>
+                  <th class="py-3 px-4 text-right">计划加工数</th>
+                  <th class="py-3 px-4 text-center">状态</th>
+                  <th class="py-3 px-4">创建时间</th>
+                  <th class="py-3 px-4 w-72">操作与联动检验</th>
+                </tr>
+              </thead>
+              <tbody id="production-orders-tbody" class="divide-y divide-slate-100">
+                <!-- Production lists -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== VIEW: SALES ==================== -->
+      <div id="view-sales" class="view-panel space-y-6 hidden">
+        <!-- Add Sales Order Form -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+          <h3 class="font-display font-semibold text-lg text-slate-900 mb-4 flex items-center">
+            <i class="fa-solid fa-plus-circle text-primary-500 mr-2"></i>
+            录入销售订单（FIFO 出库）
+          </h3>
+          <form id="form-sales" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">客户名称 <span class="text-red-500">*</span></label>
+                <div class="flex space-x-2">
+                  <select id="sales-customer" class="flex-1 rounded-lg border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 border" required>
+                    <option value="">-- 选择客户 --</option>
+                  </select>
+                  <button type="button" onclick="showModal('modal-add-customer')" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 rounded-lg border border-slate-200" title="新增客户">
+                    <i class="fa-solid fa-plus"></i>
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">销售成品 <span class="text-red-500">*</span></label>
+                <select id="sales-finished-good" class="w-full rounded-lg border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 border" required>
+                  <option value="">-- 选择要销售的成品 --</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">销售单价 (元) <span class="text-red-500">*</span></label>
+                <input type="number" min="0.01" step="0.01" id="sales-price" placeholder="销售售价" class="w-full rounded-lg border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 border" required>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">销售数量 <span class="text-red-500">*</span></label>
+                <input type="number" min="1" step="1" id="sales-qty" placeholder="购买数量" class="w-full rounded-lg border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 border" required>
+              </div>
+            </div>
+
+            <!-- Real-time estimation alert -->
+            <div id="sales-est-panel" class="hidden text-xs bg-slate-50 border border-slate-200 p-3 rounded-lg flex flex-col md:flex-row md:items-center justify-between">
+              <div>
+                <span class="text-slate-500">成品当前库存总计: </span>
+                <strong id="sales-est-stock" class="text-slate-800 mr-4">0 pcs</strong>
+                <span class="text-slate-500">预计订单总额: </span>
+                <strong id="sales-est-total" class="text-primary-600 font-bold mr-4">￥0.00</strong>
+              </div>
+              <div id="sales-error-msg" class="text-red-600 font-semibold mt-1 md:mt-0">
+                <!-- Real-time stock validations -->
+              </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 border-t border-slate-100 pt-4">
+              <button type="reset" class="px-5 py-2 border border-slate-200 rounded-lg text-sm text-slate-500 hover:bg-slate-50">重置表单</button>
+              <button type="submit" id="btn-sales-submit" class="px-5 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-semibold shadow-sm transition duration-150">确认销售发货</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Sales History -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-display font-semibold text-lg text-slate-900">销售订单历史与利润结算表</h3>
+            <span class="text-xs text-slate-400">系统自动按照 FIFO 完工批次成本结算各单利润。</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 bg-slate-50 text-slate-500 font-medium">
+                  <th class="py-3 px-4">订单号</th>
+                  <th class="py-3 px-4">销售日期</th>
+                  <th class="py-3 px-4">客户</th>
+                  <th class="py-3 px-4">成品名称</th>
+                  <th class="py-3 px-4">规格</th>
+                  <th class="py-3 px-4 text-right">单价 (元)</th>
+                  <th class="py-3 px-4 text-right">数量</th>
+                  <th class="py-3 px-4 text-right">总销额 (元)</th>
+                  <th class="py-3 px-4 text-right">销货成本</th>
+                  <th class="py-3 px-4 text-right text-emerald-700">净利润</th>
+                  <th class="py-3 px-4">出库批次</th>
+                </tr>
+              </thead>
+              <tbody id="sales-history-tbody" class="divide-y divide-slate-100">
+                <!-- Sales orders dynamic -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+    </main>
+  </div>
+
+  <!-- ==================== MODAL: SUPPLIER ADD ==================== -->
+  <div id="modal-add-supplier" class="fixed inset-0 bg-slate-950/50 flex items-center justify-center hidden z-50 transition duration-200">
+    <div class="bg-white w-full max-w-md p-6 rounded-xl shadow-lg border border-slate-100 scale-95 transition">
+      <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+        <h3 class="font-display font-semibold text-lg text-slate-900">添加供应商</h3>
+        <button onclick="closeModal('modal-add-supplier')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-times"></i></button>
+      </div>
+      <form id="form-add-supplier" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">供应商名称 <span class="text-red-500">*</span></label>
+          <input type="text" id="supplier-name" class="w-full rounded-lg border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 border" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">联系人</label>
+          <input type="text" id="supplier-contact" class="w-full rounded-lg border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 border">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">联系电话</label>
+          <input type="text" id="supplier-phone" class="w-full rounded-lg border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 border">
+        </div>
+        <div class="flex justify-end space-x-2 pt-4 border-t border-slate-100">
+          <button type="button" onclick="closeModal('modal-add-supplier')" class="px-4 py-2 border border-slate-200 rounded-lg text-sm text-slate-500 hover:bg-slate-50">取消</button>
+          <button type="submit" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-semibold shadow-sm">保存供应商</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: CUSTOMER ADD ==================== -->
+  <div id="modal-add-customer" class="fixed inset-0 bg-slate-950/50 flex items-center justify-center hidden z-50 transition duration-200">
+    <div class="bg-white w-full max-w-md p-6 rounded-xl shadow-lg border border-slate-100 scale-95 transition">
+      <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+        <h3 class="font-display font-semibold text-lg text-slate-900">添加客户</h3>
+        <button onclick="closeModal('modal-add-customer')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-times"></i></button>
+      </div>
+      <form id="form-add-customer" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">客户名称 <span class="text-red-500">*</span></label>
+          <input type="text" id="customer-name" class="w-full rounded-lg border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 border" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">联系人</label>
+          <input type="text" id="customer-contact" class="w-full rounded-lg border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 border">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">联系电话</label>
+          <input type="text" id="customer-phone" class="w-full rounded-lg border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 border">
+        </div>
+        <div class="flex justify-end space-x-2 pt-4 border-t border-slate-100">
+          <button type="button" onclick="closeModal('modal-add-customer')" class="px-4 py-2 border border-slate-200 rounded-lg text-sm text-slate-500 hover:bg-slate-50">取消</button>
+          <button type="submit" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-semibold shadow-sm">保存客户</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: EDIT BOM ==================== -->
+  <div id="modal-edit-bom" class="fixed inset-0 bg-slate-950/50 flex items-center justify-center hidden z-50 transition duration-200">
+    <div class="bg-white w-full max-w-lg p-6 rounded-xl shadow-lg border border-slate-100 scale-95 transition">
+      <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+        <h3 class="font-display font-semibold text-lg text-slate-900">BOM 配比关系配置</h3>
+        <button onclick="closeModal('modal-edit-bom')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-times"></i></button>
+      </div>
+      <form id="form-edit-bom" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">目标生产成品 <span class="text-red-500">*</span></label>
+          <select id="bom-target-finished-good" class="w-full rounded-lg border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 border" required>
+            <option value="">-- 选择目标成品 --</option>
+          </select>
+        </div>
+        
+        <div class="border-t border-slate-100 pt-4">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-semibold text-slate-800">原料配比清单</span>
+            <button type="button" id="btn-bom-add-row" class="text-xs text-primary-600 hover:text-primary-700 flex items-center">
+              <i class="fa-solid fa-plus mr-1"></i> 添加所需原料
+            </button>
+          </div>
+          <div class="max-h-60 overflow-y-auto pr-1">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50 font-medium">
+                  <th class="py-2 px-3 w-3/5">所需原料</th>
+                  <th class="py-2 px-3">用量配比 (1成品耗用量)</th>
+                  <th class="py-2 px-3 text-center w-16">操作</th>
+                </tr>
+              </thead>
+              <tbody id="bom-items-tbody">
+                <!-- Dynamic BOM edit rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-4 border-t border-slate-100">
+          <button type="button" onclick="closeModal('modal-edit-bom')" class="px-4 py-2 border border-slate-200 rounded-lg text-sm text-slate-500 hover:bg-slate-50">取消</button>
+          <button type="submit" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-semibold shadow-sm">保存 BOM 配置</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: DRILL DOWN BATCH TRACING ==================== -->
+  <div id="modal-drilldown" class="fixed inset-0 bg-slate-950/50 flex items-center justify-center hidden z-50 transition duration-200">
+    <div class="bg-white w-full max-w-2xl p-6 rounded-xl shadow-lg border border-slate-100 scale-95 transition">
+      <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+        <div class="flex items-center space-x-2">
+          <span class="p-1.5 bg-emerald-50 text-emerald-700 rounded-lg"><i class="fa-solid fa-route"></i></span>
+          <h3 class="font-display font-semibold text-lg text-slate-900">成品批次质量追溯卡</h3>
+        </div>
+        <button onclick="closeModal('modal-drilldown')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-times"></i></button>
+      </div>
+
+      <div class="space-y-6">
+        <!-- Trace Header Summary -->
+        <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-lg text-sm">
+          <div>
+            <p class="text-slate-400 text-xs">追溯成品批次号</p>
+            <p id="trace-modal-batch-no" class="font-mono font-bold text-slate-800">MFG-20260702-001</p>
+          </div>
+          <div>
+            <p class="text-slate-400 text-xs">完工产出成品</p>
+            <p id="trace-modal-finished-name" class="font-semibold text-slate-800">工业阀门 (DN50)</p>
+          </div>
+          <div>
+            <p class="text-slate-400 text-xs">生产完工日期</p>
+            <p id="trace-modal-date" class="text-slate-800">2026-07-02</p>
+          </div>
+          <div>
+            <p class="text-slate-400 text-xs">当前批次库存</p>
+            <p id="trace-modal-qty" class="text-slate-800">10 pcs (初始 10 pcs)</p>
+          </div>
+        </div>
+
+        <!-- Trace Raw Materials Used -->
+        <div>
+          <h4 class="text-sm font-semibold text-slate-900 mb-3 flex items-center">
+            <i class="fa-solid fa-boxes-packing text-primary-500 mr-2"></i>
+            原料批次耗用明细
+          </h4>
+          <div class="overflow-x-auto border border-slate-100 rounded-lg">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-100 text-slate-500 font-medium">
+                  <th class="py-2.5 px-3">原料名称</th>
+                  <th class="py-2.5 px-3">规格型号</th>
+                  <th class="py-2.5 px-3">消耗原料批次号</th>
+                  <th class="py-2.5 px-3 text-right">消耗数量</th>
+                  <th class="py-2.5 px-3 text-right">原料批次采购单价</th>
+                  <th class="py-2.5 px-3">采购供应商</th>
+                </tr>
+              </thead>
+              <tbody id="trace-modal-materials-tbody" class="divide-y divide-slate-100 text-slate-600">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Dynamic traceability flowchart using pure CSS -->
+        <div>
+          <h4 class="text-sm font-semibold text-slate-900 mb-3">溯源图谱可视化</h4>
+          <div class="bg-slate-50 p-4 rounded-lg flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 text-xs">
+            <div class="flex flex-col items-center p-3 bg-white border border-slate-200 rounded-lg shadow-sm w-full md:w-1/3 text-center">
+              <i class="fa-solid fa-truck text-amber-500 text-lg mb-1"></i>
+              <span class="font-bold text-slate-700">1. 原料采购入库</span>
+              <span id="flow-suppliers" class="text-[10px] text-slate-400 mt-1">供应商批次</span>
+            </div>
+            
+            <div class="text-slate-400 hidden md:block"><i class="fa-solid fa-circle-chevron-right text-lg"></i></div>
+            
+            <div class="flex flex-col items-center p-3 bg-white border border-slate-200 rounded-lg shadow-sm w-full md:w-1/3 text-center">
+              <i class="fa-solid fa-gears text-primary-500 text-lg mb-1"></i>
+              <span class="font-bold text-slate-700">2. 生产加工 (BOM)</span>
+              <span id="flow-materials" class="text-[10px] text-slate-400 mt-1">原料批次扣减</span>
+            </div>
+            
+            <div class="text-slate-400 hidden md:block"><i class="fa-solid fa-circle-chevron-right text-lg"></i></div>
+            
+            <div class="flex flex-col items-center p-3 bg-white border border-slate-200 rounded-lg shadow-sm w-full md:w-1/3 text-center">
+              <i class="fa-solid fa-cube text-emerald-500 text-lg mb-1"></i>
+              <span class="font-bold text-slate-700">3. 成品完工入库</span>
+              <span id="flow-finished" class="text-[10px] text-slate-400 mt-1">成品批次就绪</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-4 mt-6 border-t border-slate-100">
+        <button onclick="closeModal('modal-drilldown')" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold rounded-lg shadow-sm">
+          关闭溯源卡
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
